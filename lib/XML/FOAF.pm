@@ -1,4 +1,4 @@
-# $Id: FOAF.pm,v 1.5 2003/06/24 22:35:40 btrott Exp $
+# $Id: FOAF.pm 1758 2005-01-01 01:28:15Z btrott $
 
 package XML::FOAF;
 use strict;
@@ -12,9 +12,8 @@ use RDF::Core::Storage::Memory;
 use RDF::Core::Model::Parser;
 use RDF::Core::Resource;
 
-use vars qw( $VERSION $NAMESPACE );
-$VERSION = '0.02';
-$NAMESPACE = 'http://xmlns.com/foaf/0.1/';
+our $VERSION = '0.03';
+our $NAMESPACE = 'http://xmlns.com/foaf/0.1/';
 
 sub new {
     my $class = shift;
@@ -78,24 +77,16 @@ sub find_foaf {
     my $req = HTTP::Request->new(GET => $url);
     my $res = $ua->request($req);
     if ($res->content_type eq 'text/html') {
-        my $foaf_url;
-        my $find_links = sub {
-            my($tag, $attr) = @_;
-            $foaf_url = $attr->{href}
-                if $tag eq 'link' &&
-                   $attr->{rel} eq 'meta' &&
-                   $attr->{type} eq 'application/rdf+xml' &&
-                   $attr->{title} eq 'FOAF';
-        };
         require HTML::Parser;
-        my $p = HTML::Parser->new(api_version => 3,
-                                  start_h => [ $find_links, "tagname, attr" ]);
+        my $p = HTML::Parser->new(
+            api_version => 3,
+            start_h => [ \&_find_links, "self,tagname,attr" ]);
+        $p->{base_uri} = $url;
         $p->parse($res->content);
-        if ($foaf_url) {
-            $foaf_url = URI->new_abs($foaf_url, $url);
-            $req = HTTP::Request->new(GET => $foaf_url);
+        if ($p->{foaf_url}) {
+            $req = HTTP::Request->new(GET => $p->{foaf_url});
             $res = $ua->request($req);
-            return($foaf_url, $res->content)
+            return($p->{foaf_url}, $res->content)
                 if $res->is_success;
         }
     } else {
@@ -103,12 +94,40 @@ sub find_foaf {
     }
 }
 
+sub find_foaf_in_html {
+    my $class = shift;
+    my($html, $base_uri) = @_;
+    require HTML::Parser;
+    my $p = HTML::Parser->new(
+        api_version => 3,
+        start_h => [ \&_find_links, "self,tagname,attr" ]
+    );
+    $p->{base_uri} = $base_uri;
+    $p->parse($$html);
+    $p->{foaf_url};
+}
+
+sub _find_links {
+    my($p, $tag, $attr) = @_;
+    $p->{foaf_url} = URI->new_abs($attr->{href}, $p->{base_uri})
+        if $tag eq 'link' &&
+           $attr->{rel} eq 'meta' &&
+           $attr->{type} eq 'application/rdf+xml' &&
+           $attr->{title} eq 'FOAF';
+}
+
 sub person {
     my $foaf = shift;
-    my $enum = $foaf->{model}->getStmts(undef,
-    RDF::Core::Resource->new('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-    RDF::Core::Resource->new($NAMESPACE . 'Person')
-    ) or return;
+    my $type = RDF::Core::Resource->new('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+    my $enum;
+    ## Look for case-insensitive "Person" or "person".
+    for my $e (qw( Person person )) {
+        $enum = $foaf->{model}->getStmts(undef, $type,
+            RDF::Core::Resource->new($NAMESPACE . $e) 
+        );
+        last if $enum && $enum->getFirst;
+    }
+    return unless $enum && $enum->getFirst;
     XML::FOAF::Person->new($foaf, $enum->getFirst->getSubject);
 }
 

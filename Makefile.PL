@@ -1,24 +1,28 @@
-# $Id: Makefile.PL,v 1.2 2003/01/27 23:53:15 btrott Exp $
+# $Id: Makefile.PL 1758 2005-01-01 01:28:15Z btrott $
 
-use ExtUtils::MakeMaker;
-use strict;
+use inc::Module::Install;
 
-use ExtUtils::AutoInstall (
-    -core => [
-        'RDF::Core' => 0,
-        'URI' => 0,
-    ],
+name('XML-FOAF');
+abstract('Parse FOAF (Friend of a Friend) data');
+author('Benjamin Trott <ben+cpan@stupidfool.org>');
+version_from('lib/XML/FOAF.pm');
+license('perl');
+no_index(directory => 't');
+sign(1);
 
+include('ExtUtils::AutoInstall');
+
+requires('RDF::Core');
+requires('URI');
+
+features(
     'Signature verification' => [
         -default => 0,
-        'Crypt::OpenPGP' => '1.03',
+        recommends('Crypt::OpenPGP' => '1.03'),
     ],
 );
 
-WriteMakefile(
-    NAME => 'XML::FOAF',
-    DISTNAME => 'XML-FOAF',
-    VERSION_FROM => 'lib/XML/FOAF.pm',
-    AUTHOR => 'Benjamin Trott <cpan@stupidfool.org>',
-    ABSTRACT => 'Parse FOAF (Friend of a Friend) data',
-);
+auto_include();
+auto_install();
+
+&WriteAll;

@@ -1,14 +1,15 @@
-# $Id: 01-new.t,v 1.4 2003/06/24 22:35:52 btrott Exp $
+# $Id: 01-new.t 972 2004-12-31 22:58:11Z btrott $
 
 use strict;
 
-use Test;
+use Test::More tests => 7;
 use XML::FOAF;
 use File::Basename qw( dirname );
 use File::Spec;
 use URI;
+use LWP::UserAgent;
 
-BEGIN { plan tests => 5 }
+use constant BASE => 'http://stupidfool.org/perl/foaf/';
 
 my $dir = File::Spec->rel2abs(dirname($0));
 my $test_file = File::Spec->catfile($dir, 'samples', 'bare.foaf');
@@ -27,4 +28,9 @@ seek $fh, 0, 0;
 my $data = do { local $/; <$fh> };
 ok(XML::FOAF->new(\$data, 'http://foo.com'));
 
-## xxx need to test auto-discovery
+my $ua = LWP::UserAgent->new;
+my $req = HTTP::Request->new(GET => BASE . 'base.html');
+my $res = $ua->request($req);
+my $foaf_url = XML::FOAF->find_foaf_in_html(\$res->content, BASE . 'base.html');
+ok($foaf_url);
+is($foaf_url, BASE . 'foaf.rdf');

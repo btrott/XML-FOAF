@@ -1,4 +1,4 @@
-# $Id: Person.pm,v 1.3 2003/06/24 22:37:56 btrott Exp $
+# $Id: Person.pm 968 2003-06-24 22:37:56Z btrott $
 
 package XML::FOAF::Person;
 use strict;

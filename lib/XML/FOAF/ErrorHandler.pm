@@ -1,4 +1,4 @@
-# $Id: ErrorHandler.pm,v 1.1 2003/01/27 23:52:47 btrott Exp $
+# $Id: ErrorHandler.pm 961 2003-01-27 23:52:47Z btrott $
 
 package XML::FOAF::ErrorHandler;
 use strict;
