@@ -1,6 +1,11 @@
-$Id: Changes,v 1.1 2003/01/27 21:42:29 btrott Exp $
+$Id: Changes,v 1.2 2003/06/24 22:35:18 btrott Exp $
 
 Revision history for XML::FOAF
+
+0.02  2003.06.04
+    - Added support for FOAF auto-discovery
+    - Added FOAF::Person::get to retrieve RDF object values given a
+      predicate.
 
 0.01  2003.01.27
     - Initial distribution.

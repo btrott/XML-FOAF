@@ -1,4 +1,4 @@
-# $Id: Person.pm,v 1.2 2003/01/27 21:37:41 btrott Exp $
+# $Id: Person.pm,v 1.3 2003/06/24 22:37:56 btrott Exp $
 
 package XML::FOAF::Person;
 use strict;
@@ -22,18 +22,25 @@ sub knows {
     \@knows;
 }
 
+sub get {
+    my $person = shift;
+    my($what) = @_;
+    unless ($what =~ /:/) {
+        $what = $XML::FOAF::NAMESPACE . $what;
+    }
+    my $res = RDF::Core::Resource->new($what);
+    my $enum = $person->{foaf}->{model}->getStmts($person->{subject}, $res);
+    my $stmt = $enum->getFirst or return undef;
+    $stmt->getObject->getLabel;
+}
+
 sub DESTROY { }
 
 use vars qw( $AUTOLOAD );
 sub AUTOLOAD {
     (my $var = $AUTOLOAD) =~ s!.+::!!;
     no strict 'refs';
-    *$AUTOLOAD = sub {
-        my $res = RDF::Core::Resource->new($XML::FOAF::NAMESPACE . $var);
-        my $enum = $_[0]->{foaf}->{model}->getStmts($_[0]->{subject}, $res);
-        my $stmt = $enum->getFirst or return undef;
-        $stmt->getObject->getLabel;
-    };
+    *$AUTOLOAD = sub { $_[0]->get($var) };
     goto &$AUTOLOAD;
 }
 

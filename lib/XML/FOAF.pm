@@ -1,18 +1,19 @@
-# $Id: FOAF.pm,v 1.4 2003/01/27 23:52:33 btrott Exp $
+# $Id: FOAF.pm,v 1.5 2003/06/24 22:35:40 btrott Exp $
 
 package XML::FOAF;
 use strict;
 
+use base qw( XML::FOAF::ErrorHandler );
+
+use LWP::UserAgent;
+use XML::FOAF::Person;
 use RDF::Core::Model;
 use RDF::Core::Storage::Memory;
 use RDF::Core::Model::Parser;
 use RDF::Core::Resource;
 
-use XML::FOAF::Person;
-use base qw( XML::FOAF::ErrorHandler );
-
 use vars qw( $VERSION $NAMESPACE );
-$VERSION = '0.01';
+$VERSION = '0.02';
 $NAMESPACE = 'http://xmlns.com/foaf/0.1/';
 
 sub new {
@@ -21,10 +22,12 @@ sub new {
     my($stream, $base_uri) = @_;
     my $store = RDF::Core::Storage::Memory->new;
     $foaf->{model} = RDF::Core::Model->new(Storage => $store);
+    $foaf->{ua} = LWP::UserAgent->new;
     my %pair;
     if (UNIVERSAL::isa($stream, 'URI')) {
-        require LWP::Simple;
-        my $data = LWP::Simple::get($stream);
+        ($stream, my($data)) = $foaf->find_foaf($stream);
+        return $class->error("Can't find FOAF file") unless $stream;
+        $foaf->{foaf_url} = $stream->as_string;
         $foaf->{raw_data} = \$data;
         %pair = ( Source => $data, SourceType => 'string' );
         unless ($base_uri) {
@@ -64,6 +67,40 @@ sub new {
         return $class->error($@);
     }
     $foaf;
+}
+
+sub foaf_url { $_[0]->{foaf_url} }
+
+sub find_foaf {
+    my $foaf = shift;
+    my($url) = @_;
+    my $ua = $foaf->{ua};
+    my $req = HTTP::Request->new(GET => $url);
+    my $res = $ua->request($req);
+    if ($res->content_type eq 'text/html') {
+        my $foaf_url;
+        my $find_links = sub {
+            my($tag, $attr) = @_;
+            $foaf_url = $attr->{href}
+                if $tag eq 'link' &&
+                   $attr->{rel} eq 'meta' &&
+                   $attr->{type} eq 'application/rdf+xml' &&
+                   $attr->{title} eq 'FOAF';
+        };
+        require HTML::Parser;
+        my $p = HTML::Parser->new(api_version => 3,
+                                  start_h => [ $find_links, "tagname, attr" ]);
+        $p->parse($res->content);
+        if ($foaf_url) {
+            $foaf_url = URI->new_abs($foaf_url, $url);
+            $req = HTTP::Request->new(GET => $foaf_url);
+            $res = $ua->request($req);
+            return($foaf_url, $res->content)
+                if $res->is_success;
+        }
+    } else {
+        return($url, $res->content);
+    }
 }
 
 sub person {
@@ -147,6 +184,14 @@ An object blessed into any I<URI> subclass. For example:
 
     my $uri = URI->new('http://foo.com/my.foaf');
     my $foaf = XML::FOAF->new($uri);
+
+The URI can be either for a FOAF file (for example, the above), or an HTML
+page containing a C<E<lt>linkE<gt>> tag for FOAF auto-discovery:
+
+    <link rel="meta" type="application/rdf+xml" title="FOAF" href="http://foo.com/my.foaf" />
+
+If the URI points to an HTML page with FOAF auto-discovery enabled,
+I<XML::FOAF> will parse the HTML to find the FOAF file automatically.
 
 =item * A scalar reference
 
