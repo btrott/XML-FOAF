@@ -1,0 +1,25 @@
+$Id: README,v 1.1 2003/01/27 21:45:01 btrott Exp $
+
+This is XML::FOAF.
+
+PREREQUISITES
+
+    * RDF::Core
+
+INSTALLATION
+
+XML::FOAF installation is straightforward. If your CPAN shell
+is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install XML::FOAF'
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Benjamin Trott / cpan@stupidfool.org
