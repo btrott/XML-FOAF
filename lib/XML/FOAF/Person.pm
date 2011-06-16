@@ -1,5 +1,3 @@
-# $Id: Person.pm 968 2003-06-24 22:37:56Z btrott $
-
 package XML::FOAF::Person;
 use strict;
 
@@ -53,6 +51,7 @@ XML::FOAF::Person - A Person class in a FOAF file
 
 =head1 SYNOPSIS
 
+    my $foaf = XML::FOAF->new(URI->new('http://foo.com/my.foaf'));
     my $person = $foaf->person;
     print $person->mbox, "\n";
     my $people = $foaf->knows;

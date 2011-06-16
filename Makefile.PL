@@ -1,28 +1,15 @@
-# $Id: Makefile.PL 1758 2005-01-01 01:28:15Z btrott $
-
 use inc::Module::Install;
+name 'XML-FOAF';
+all_from 'lib/XML/FOAF.pm';
+readme_from 'lib/XML/FOAF.pm';
 
-name('XML-FOAF');
-abstract('Parse FOAF (Friend of a Friend) data');
-author('Benjamin Trott <ben+cpan@stupidfool.org>');
-version_from('lib/XML/FOAF.pm');
-license('perl');
-no_index(directory => 't');
-sign(1);
+requires 'RDF::Core';
+requires 'URI';
 
-include('ExtUtils::AutoInstall');
+test_requires 'Test::More';
 
-requires('RDF::Core');
-requires('URI');
-
-features(
-    'Signature verification' => [
-        -default => 0,
-        recommends('Crypt::OpenPGP' => '1.03'),
-    ],
-);
-
-auto_include();
-auto_install();
-
-&WriteAll;
+use_test_base;
+auto_include_deps;
+author_tests('xt');
+auto_set_repository;
+WriteAll;

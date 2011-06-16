@@ -1,7 +1,6 @@
-# $Id: FOAF.pm 1758 2005-01-01 01:28:15Z btrott $
-
 package XML::FOAF;
 use strict;
+use 5.008_001;
 
 use base qw( XML::FOAF::ErrorHandler );
 
@@ -12,7 +11,7 @@ use RDF::Core::Storage::Memory;
 use RDF::Core::Model::Parser;
 use RDF::Core::Resource;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $NAMESPACE = 'http://xmlns.com/foaf/0.1/';
 
 sub new {
@@ -255,6 +254,8 @@ signature from a keyserver. If no PGP signature is noted in the FOAF file,
 or if an error occurs, C<undef> is returned. If the signature is invalid,
 C<0> is returned. If the signature is valid, the PGP identity (name and
 email address, generally) of the signer is returned.
+
+Requires I<Crypt::OpenPGP> to be installed.
 
 =head1 REFERENCES
 

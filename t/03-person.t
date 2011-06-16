@@ -1,5 +1,3 @@
-# $Id: 03-person.t 1758 2005-01-01 01:28:15Z btrott $
-
 use strict;
 
 use Test;

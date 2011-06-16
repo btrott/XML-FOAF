@@ -1,5 +1,3 @@
-# $Id: 02-parse.t 962 2003-01-27 23:53:02Z btrott $
-
 use strict;
 
 use Test;

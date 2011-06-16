@@ -1,5 +1,3 @@
-# $Id: 01-new.t 972 2004-12-31 22:58:11Z btrott $
-
 use strict;
 
 use Test::More tests => 7;

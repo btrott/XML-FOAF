@@ -1,6 +1,10 @@
-$Id: Changes 1758 2005-01-01 01:28:15Z btrott $
-
 Revision history for XML::FOAF
+
+0.04  2011.06.16
+    - Cleaned up Makefile.PL.
+    - Removed magic svn keywords.
+    - Added author tests (xt/) and modified SYNOPSIS for all modules to
+      make them pass the compilation test.
 
 0.03  2004.12.31
     - Added XML::FOAF::find_foaf_in_html to auto-discover FOAF content
