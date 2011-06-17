@@ -1,6 +1,6 @@
 use strict;
 
-use Test;
+use Test::More;
 use XML::FOAF;
 use File::Basename qw( dirname );
 use File::Spec;
