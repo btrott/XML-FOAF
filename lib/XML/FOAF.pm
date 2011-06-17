@@ -50,6 +50,12 @@ sub new {
         $foaf->{raw_data} = $stream;
         %pair = ( Source => $stream, SourceType => 'file' );
     }
+    ## Turn off expanding external entities in XML::Parser to avoid
+    ## security risk reading local file due to usage of XML::Parser
+    ## in RDF::Core::Parser.
+    local $XML::Parser::Expat::Handler_Setters{ExternEnt}    = sub {};
+    local $XML::Parser::Expat::Handler_Setters{ExternEntFin} = sub {};
+
     my $parser = RDF::Core::Model::Parser->new(
                        Model => $foaf->{model},
                        BaseURI => $base_uri,
