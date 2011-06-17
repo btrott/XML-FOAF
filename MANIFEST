@@ -29,6 +29,7 @@ t/00-compile.t
 t/01-new.t
 t/02-parse.t
 t/03-person.t
+t/04-external-entity.t
 t/samples/bare.foaf
 t/samples/person-lower-case.foaf
 t/samples/person.foaf
