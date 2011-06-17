@@ -1,6 +1,8 @@
 Revision history for XML::FOAF
 
 0.04  2011.06.16
+    - Turn off expanding external entities in XML::Parser to avoid security
+      risk.
     - Cleaned up Makefile.PL.
     - Removed magic svn keywords.
     - Added author tests (xt/) and modified SYNOPSIS for all modules to
