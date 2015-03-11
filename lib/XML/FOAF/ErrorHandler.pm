@@ -1,5 +1,6 @@
 package XML::FOAF::ErrorHandler;
 use strict;
+use warnings;
 
 use vars qw( $ERROR );
 
