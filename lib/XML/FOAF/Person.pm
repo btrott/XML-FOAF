@@ -1,5 +1,6 @@
 package XML::FOAF::Person;
 use strict;
+use warnings;
 
 use RDF::Core::Resource;
 
