@@ -3,6 +3,8 @@ name 'XML-FOAF';
 all_from 'lib/XML/FOAF.pm';
 readme_from 'lib/XML/FOAF.pm';
 
+requires 'HTML::Parser';
+requires 'LWP::UserAgent';
 requires 'RDF::Core';
 requires 'URI';
 
